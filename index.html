@@ -321,18 +321,29 @@
                     <!-- Inner Content (PDF Viewer) -->
                     <div class="book-content absolute inset-0 bg-[#1a1a1a] rounded-xl flex items-center justify-center z-10">
                         <!-- Close button for book -->
-                        <button onclick="closeBook(event)" class="absolute -top-12 right-0 md:top-4 md:-right-16 w-10 h-10 bg-gray-800 text-white rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors z-50">
+                        <button onclick="closeBook(event)" class="absolute -top-12 right-0 md:top-4 md:-right-16 w-10 h-10 bg-gray-800 text-white rounded-full flex items-center justify-center hover:bg-orange-600 transition-colors z-50 shadow-lg border border-gray-700">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                         
-                        <div class="p-2 h-[80vh] w-full rounded-xl overflow-hidden">
+                        <div class="p-2 h-[80vh] w-full rounded-xl overflow-hidden relative">
+                            <!-- Language Selector overlay -->
+                            <div class="absolute top-4 left-4 z-50 bg-gray-900/90 backdrop-blur p-2 rounded-lg border border-gray-700 shadow-lg flex items-center gap-2">
+                                <i class="fa-solid fa-language text-orange-400"></i>
+                                <select id="pdf-language" onchange="changePDFLanguage(this.value)" class="bg-transparent text-white text-sm font-inter outline-none cursor-pointer">
+                                    <option value="gita.pdf" class="bg-gray-800">English</option>
+                                    <option value="gita-hindi.pdf" class="bg-gray-800">Hindi</option>
+                                    <option value="gita-sanskrit.pdf" class="bg-gray-800">Sanskrit</option>
+                                </select>
+                            </div>
+
                             <!-- The iframe to host the local PDF with Lazy Loading added -->
                             <iframe 
+                                id="geeta-iframe"
                                 src="gita.pdf" 
                                 class="w-full h-full border-0 rounded-lg bg-gray-900"
                                 title="Bhagavad Gita PDF"
                                 loading="lazy"
-                                onerror="this.outerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-center p-8\'><i class=\'fa-solid fa-file-pdf text-6xl text-gray-600 mb-4\'></i><h3 class=\'text-2xl text-white font-cinzel mb-2\'>PDF Not Found</h3><p class=\'text-gray-400\'>Please ensure you have placed your PDF file in the same folder as this HTML file and updated the <code>src</code> attribute in the code to match your filename (e.g., <code>src=\"geeta.pdf\"</code>).</p></div>'"
+                                onerror="this.outerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-center p-8\'><i class=\'fa-solid fa-file-pdf text-6xl text-gray-600 mb-4\'></i><h3 class=\'text-2xl text-white font-cinzel mb-2\'>PDF Not Found</h3><p class=\'text-gray-400\'>Please ensure you have placed your PDF file in the same folder as this HTML file.</p></div>'"
                             >
                                 Your browser does not support iframes.
                             </iframe>
@@ -406,6 +417,13 @@
             book.classList.remove('book-open');
             isBookOpen = false;
             book.style.cursor = 'pointer';
+        }
+
+        function changePDFLanguage(pdfFile) {
+            const iframe = document.getElementById('geeta-iframe');
+            if(iframe) {
+                iframe.src = pdfFile;
+            }
         }
 
         // ----------------------------------------------------
