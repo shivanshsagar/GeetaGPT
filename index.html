@@ -365,7 +365,7 @@
                         </button>
                         
                         <div class="p-2 h-[80vh] w-full rounded-xl overflow-hidden relative">
-                            <!-- Overlay UI Controls (Language + Chapters) -->
+                            <!-- Overlay UI Controls (Language) -->
                             <div class="absolute top-4 left-4 z-50 flex flex-col sm:flex-row gap-2 pointer-events-auto">
                                 
                                 <!-- Language Selector -->
@@ -375,33 +375,6 @@
                                         <option value="gita.pdf" class="bg-gray-800">English</option>
                                         <option value="gita-hindi.pdf" class="bg-gray-800">Hindi</option>
                                         <option value="gita-sanskrit.pdf" class="bg-gray-800">Sanskrit</option>
-                                    </select>
-                                </div>
-
-                                <!-- Chapter Bookmark Selector -->
-                                <div class="bg-gray-900/90 backdrop-blur p-2 rounded-lg border border-gray-700 shadow-lg flex items-center gap-2">
-                                    <i class="fa-solid fa-bookmark text-orange-400"></i>
-                                    <select id="pdf-chapter" onchange="updatePDF()" class="bg-transparent text-white text-sm font-inter outline-none cursor-pointer max-w-[140px] md:max-w-[200px] truncate">
-                                        <option value="" class="bg-gray-800">Select Chapter</option>
-                                        <!-- IMPORTANT: Change the value="..." attributes below to match the actual page numbers in your PDF -->
-                                        <option value="5" class="bg-gray-800">Ch 1: Arjuna Visada Yoga</option>
-                                        <option value="12" class="bg-gray-800">Ch 2: Sankhya Yoga</option>
-                                        <option value="25" class="bg-gray-800">Ch 3: Karma Yoga</option>
-                                        <option value="36" class="bg-gray-800">Ch 4: Jnana Karma Sanyasa Yoga</option>
-                                        <option value="48" class="bg-gray-800">Ch 5: Karma Sanyasa Yoga</option>
-                                        <option value="55" class="bg-gray-800">Ch 6: Dhyana Yoga</option>
-                                        <option value="68" class="bg-gray-800">Ch 7: Gyaan Vigyana Yoga</option>
-                                        <option value="75" class="bg-gray-800">Ch 8: Akshara Brahma Yoga</option>
-                                        <option value="85" class="bg-gray-800">Ch 9: Raja Vidya Yoga</option>
-                                        <option value="96" class="bg-gray-800">Ch 10: Vibhooti Yoga</option>
-                                        <option value="108" class="bg-gray-800">Ch 11: Vishwaroopa Darshana Yoga</option>
-                                        <option value="125" class="bg-gray-800">Ch 12: Bhakti Yoga</option>
-                                        <option value="132" class="bg-gray-800">Ch 13: Ksetra Ksetrajna Vibhaaga Yoga</option>
-                                        <option value="142" class="bg-gray-800">Ch 14: Gunatraya Vibhaga Yoga</option>
-                                        <option value="152" class="bg-gray-800">Ch 15: Purushottama Yoga</option>
-                                        <option value="160" class="bg-gray-800">Ch 16: Daivasura Sampad Vibhaga Yoga</option>
-                                        <option value="168" class="bg-gray-800">Ch 17: Shraddhatraya Vibhaga Yoga</option>
-                                        <option value="176" class="bg-gray-800">Ch 18: Moksha Sanyaas Yoga</option>
                                     </select>
                                 </div>
                                 
@@ -490,16 +463,13 @@
             book.style.cursor = 'pointer';
         }
 
-        // Updates both Language and Bookmark/Page
+        // Updates Language
         function updatePDF() {
             const iframe = document.getElementById('geeta-iframe');
             const langSelect = document.getElementById('pdf-language');
-            const chapSelect = document.getElementById('pdf-chapter');
             
             if(iframe) {
-                let baseFile = langSelect.value;
-                let pageFragment = chapSelect.value ? '#page=' + chapSelect.value : '';
-                iframe.src = baseFile + pageFragment;
+                iframe.src = langSelect.value;
             }
         }
 
