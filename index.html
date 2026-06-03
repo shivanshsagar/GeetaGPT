@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divine Guidance | Shri Krishna & Bhagavad Gita</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        divine: {
+                            gold: '#FFD700',
+                            goldlight: '#FFEA70',
+                            dark: '#0B1021',
+                            blue: '#1E3A8A',
+                            accent: '#F59E0B'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                        'spin-slow': 'spin 15s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        glow: {
+                            'from': { boxShadow: '0 0 10px #FFD700, 0 0 20px #FFD700' },
+                            'to': { boxShadow: '0 0 20px #FFEA70, 0 0 30px #FFEA70' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0B1021;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B1021; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E3A8A; 
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #FFD700; 
+        }
+
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        /* Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Book UI CSS */
+        .book-container {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .book {
+            width: 300px;
+            height: 400px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease;
+            box-shadow: -5px 10px 20px rgba(0,0,0,0.5);
+            border-radius: 5px 15px 15px 5px;
+        }
+        .book:hover {
+            transform: rotateY(-10deg) scale(1.05);
+            box-shadow: -15px 20px 30px rgba(0,0,0,0.6), 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #4A1D1A, #8B3A36);
+            border-radius: 5px 15px 15px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-left: 10px solid #2C100F;
+            z-index: 2;
+        }
+        .book-spine {
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: #2C100F;
+            left: -20px;
+            transform-origin: right;
+            transform: rotateY(-90deg);
+            border-radius: 5px 0 0 5px;
+        }
+        .book-pages {
+            position: absolute;
+            width: 98%;
+            height: 98%;
+            background: #f4e8d3;
+            top: 1%;
+            left: 2%;
+            z-index: 1;
+            border-radius: 0 10px 10px 0;
+            box-shadow: inset 4px 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* PDF Viewer Transition */
+        #pdf-viewer-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 1s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+        #pdf-viewer-section.open {
+            max-height: 1000px; /* Arbitrary large number to allow full expansion */
+            opacity: 1;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        /* Canvas Background */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gradient-text {
+            background: linear-gradient(to right, #FFD700, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="font-inter antialiased relative">
+
+    <nav class="fixed w-full z-50 glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0 flex items-center gap-3 cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <i class="fa-solid fa-om text-divine-gold text-3xl"></i>
+                    <span class="font-cinzel font-bold text-2xl tracking-wider text-white">GITA<span class="text-divine-gold">VANI</span></span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#about" class="text-gray-300 hover:text-divine-gold transition-colors px-3 py-2 rounded-md text-sm font-medium uppercase tracking-widest">Wisdom</a>
+                        <a href="#read" class="text-gray-300 hover:text-divine-gold transition-colors px-3 py-2 rounded-md text-sm font-medium uppercase tracking-widest">The Book</a>
+                        <a href="https://chatgpt.com/share/682ec65e-a408-8008-aa9f-2a1f221ebb41" target="_blank" class="bg-gradient-to-r from-divine-gold to-yellow-600 text-black px-6 py-2 rounded-full font-bold hover:shadow-[0_0_15px_rgba(255,215,0,0.5)] transition-all duration-300 transform hover:-translate-y-1">
+                            <i class="fa-solid fa-comment-dots mr-2"></i>Talk to Krishna
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <canvas id="particle-canvas"></canvas>
+        
+        <!-- Background Overlay Image -->
+        <div class="absolute inset-0 z-0 opacity-20" style="background-image: url('https://images.unsplash.com/photo-1590005354167-6da97ce2b4dc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0B1021]/80 to-[#0B1021] z-0"></div>
+
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center">
+            <div class="animate-float mb-8">
+                <div class="w-32 h-32 rounded-full border-2 border-divine-gold flex items-center justify-center bg-black/50 backdrop-blur-sm mx-auto shadow-[0_0_30px_rgba(255,215,0,0.3)]">
+                    <i class="fa-solid fa-feather-pointed text-5xl text-divine-gold transform -rotate-45"></i>
+                </div>
+            </div>
+            
+            <h1 class="font-cinzel text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight reveal">
+                Find Answers in the <br/>
+                <span class="gradient-text animate-pulse">Eternal Wisdom</span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto font-light leading-relaxed reveal" style="transition-delay: 200ms;">
+                Feeling lost in the modern world? Seek guidance, resolve your life's dilemmas, and find inner peace through the timeless teachings of the Bhagavad Gita.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center reveal" style="transition-delay: 400ms;">
+                <a href="https://chatgpt.com/share/682ec65e-a408-8008-aa9f-2a1f221ebb41" target="_blank" class="group relative px-8 py-4 bg-divine-gold text-black rounded-full font-bold text-lg overflow-hidden shadow-[0_0_20px_rgba(255,215,0,0.4)] hover:shadow-[0_0_40px_rgba(255,215,0,0.6)] transition-all duration-300">
+                    <div class="absolute inset-0 w-0 bg-white transition-all duration-[250ms] ease-out group-hover:w-full opacity-20"></div>
+                    <span class="relative flex items-center gap-3">
+                        <i class="fa-brands fa-rocketchat text-2xl"></i>
+                        Chat with Shri Krishna
+                    </span>
+                </a>
+                
+                <a href="#read" class="px-8 py-4 border border-divine-gold text-divine-gold rounded-full font-bold text-lg hover:bg-divine-gold/10 transition-all duration-300 flex items-center gap-3">
+                    <i class="fa-solid fa-book-open"></i>
+                    Read the Geeta
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fa-solid fa-chevron-down text-divine-gold text-2xl opacity-70"></i>
+        </div>
+    </section>
+
+    <section id="about" class="py-24 relative z-10 bg-[#0B1021]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="font-cinzel text-4xl md:text-5xl font-bold text-white mb-4">Timeless <span class="text-divine-gold">Teachings</span></h2>
+                <div class="w-24 h-1 bg-divine-gold mx-auto rounded-full mb-6"></div>
+                <p class="text-gray-400 max-w-2xl mx-auto text-lg">The Bhagavad Gita is not just a historical text; it is a manual for life, addressing the core struggles of human existence.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="glass rounded-2xl p-8 hover:-translate-y-2 transition-transform duration-300 group reveal">
+                    <div class="w-14 h-14 rounded-full bg-blue-900/50 flex items-center justify-center mb-6 border border-blue-500/30 group-hover:border-divine-gold transition-colors">
+                        <i class="fa-solid fa-scale-balanced text-2xl text-divine-gold"></i>
+                    </div>
+                    <h3 class="font-cinzel text-2xl font-bold text-white mb-4">Duty & Action</h3>
+                    <p class="text-gray-400 leading-relaxed italic mb-4">"You have a right to perform your prescribed duty, but you are not entitled to the fruits of action."</p>
+                    <p class="text-sm text-gray-500">- Chapter 2, Verse 47</p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="glass rounded-2xl p-8 hover:-translate-y-2 transition-transform duration-300 group reveal" style="transition-delay: 200ms;">
+                    <div class="w-14 h-14 rounded-full bg-blue-900/50 flex items-center justify-center mb-6 border border-blue-500/30 group-hover:border-divine-gold transition-colors">
+                        <i class="fa-solid fa-brain text-2xl text-divine-gold"></i>
+                    </div>
+                    <h3 class="font-cinzel text-2xl font-bold text-white mb-4">Mind Control</h3>
+                    <p class="text-gray-400 leading-relaxed italic mb-4">"For him who has conquered the mind, the mind is the best of friends; but for one who has failed to do so, his very mind will be the greatest enemy."</p>
+                    <p class="text-sm text-gray-500">- Chapter 6, Verse 6</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="glass rounded-2xl p-8 hover:-translate-y-2 transition-transform duration-300 group reveal" style="transition-delay: 400ms;">
+                    <div class="w-14 h-14 rounded-full bg-blue-900/50 flex items-center justify-center mb-6 border border-blue-500/30 group-hover:border-divine-gold transition-colors">
+                        <i class="fa-solid fa-heart text-2xl text-divine-gold"></i>
+                    </div>
+                    <h3 class="font-cinzel text-2xl font-bold text-white mb-4">Unconditional Love</h3>
+                    <p class="text-gray-400 leading-relaxed italic mb-4">"If one offers Me with love and devotion a leaf, a flower, fruit or water, I will accept it."</p>
+                    <p class="text-sm text-gray-500">- Chapter 9, Verse 26</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="read" class="py-24 relative bg-gradient-to-b from-[#0B1021] to-[#050811] z-10 overflow-hidden">
+        
+        <!-- Decorative background elements -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-divine-gold/5 rounded-full filter blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-blue-900/10 rounded-full filter blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div class="flex flex-col lg:flex-row items-center gap-16">
+                
+                <!-- Text Content -->
+                <div class="w-full lg:w-1/2 reveal">
+                    <h2 class="font-cinzel text-4xl md:text-5xl font-bold text-white mb-6">Read the <span class="gradient-text">Sacred Text</span></h2>
+                    <p class="text-xl text-gray-300 mb-6 font-light">
+                        Immerse yourself in the original verses. The Bhagavad Gita consists of 700 verses spread across 18 chapters, offering profound insights into the nature of reality, the self, and the universe.
+                    </p>
+                    <p class="text-gray-400 mb-8">
+                        Click the mystical book to reveal the manuscript and begin your journey of reading the uploaded scripture.
+                    </p>
+                    <div class="flex items-center gap-4 text-sm text-gray-500 bg-white/5 p-4 rounded-lg border border-white/10">
+                        <i class="fa-solid fa-circle-info text-divine-gold"></i>
+                        <p>This UI integrates seamlessly with your local PDF file for a continuous reading experience.</p>
+                    </div>
+                </div>
+
+                <!-- Animated Book UI -->
+                <div class="w-full lg:w-1/2 flex justify-center reveal" style="transition-delay: 300ms;">
+                    <div class="book-container" onclick="togglePdfViewer()">
+                        <div class="book" id="mystical-book">
+                            <div class="book-spine"></div>
+                            <div class="book-pages"></div>
+                            <div class="book-cover">
+                                <div class="w-[80%] h-[90%] border-2 border-dashed border-[#d4af37] flex flex-col items-center justify-center p-4 text-center">
+                                    <i class="fa-solid fa-om text-5xl text-[#d4af37] mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+                                    <h3 class="font-cinzel font-bold text-2xl text-[#d4af37] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] uppercase tracking-widest">Shrimad<br>Bhagavad<br>Gita</h3>
+                                    <p class="text-[#d4af37] mt-8 text-sm italic font-serif">Click to Open</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden PDF Viewer Container -->
+            <!-- USER INSTRUCTION: Replace 'your-local-geeta-book.pdf' with your actual filename -->
+            <div id="pdf-viewer-section" class="w-full mt-16 rounded-2xl glass border border-divine-gold/30 shadow-[0_0_30px_rgba(255,215,0,0.1)] relative">
+                <div class="absolute top-4 right-4 z-10">
+                    <button onclick="togglePdfViewer()" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <div class="p-2 h-[80vh] w-full rounded-xl overflow-hidden">
+                    <!-- The iframe to host the local PDF -->
+                    <iframe 
+                        src="your-local-geeta-book.pdf" 
+                        class="w-full h-full border-0 rounded-lg bg-gray-900"
+                        title="Bhagavad Gita PDF"
+                        onerror="this.outerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-center p-8\'><i class=\'fa-solid fa-file-pdf text-6xl text-gray-600 mb-4\'></i><h3 class=\'text-2xl text-white font-cinzel mb-2\'>PDF Not Found</h3><p class=\'text-gray-400\'>Please ensure you have placed your PDF file in the same folder as this HTML file and updated the <code>src</code> attribute in the code to match your filename (e.g., <code>src=\"geeta.pdf\"</code>).</p></div>'"
+                    >
+                        Your browser does not support iframes.
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 relative z-10 bg-divine-dark border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative reveal">
+            <div class="absolute inset-0 bg-gradient-to-r from-divine-blue/20 to-divine-gold/20 rounded-3xl blur-xl"></div>
+            <div class="glass rounded-3xl p-8 md:p-12 text-center relative overflow-hidden border border-divine-gold/20">
+                
+                <!-- Background pattern -->
+                <div class="absolute inset-0 opacity-5" style="background-image: radial-gradient(#FFD700 1px, transparent 1px); background-size: 20px 20px;"></div>
+                
+                <i class="fa-solid fa-hands-praying text-5xl text-divine-gold mb-6 animate-pulse"></i>
+                <h2 class="font-cinzel text-3xl md:text-5xl font-bold text-white mb-6">Confused about a situation in life?</h2>
+                <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                    Whether it's career dilemmas, relationship struggles, or a search for purpose, ask your questions and receive guidance rooted in the profound wisdom of Shri Krishna.
+                </p>
+                <a href="https://chatgpt.com/share/682ec65e-a408-8008-aa9f-2a1f221ebb41" target="_blank" class="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-divine-gold to-[#d4af37] text-black rounded-full font-bold text-xl hover:scale-105 transition-transform duration-300 shadow-[0_10px_25px_rgba(255,215,0,0.3)]">
+                    <i class="fa-brands fa-whatsapp text-2xl"></i> <!-- Using a recognizable chat icon -->
+                    Start Consulting Krishna Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-black py-10 border-t border-white/10 relative z-10 text-center">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-center gap-3 mb-6">
+                <i class="fa-solid fa-om text-divine-gold text-2xl"></i>
+                <span class="font-cinzel font-bold text-xl tracking-wider text-white">GITA<span class="text-divine-gold">VANI</span></span>
+            </div>
+            <p class="text-gray-500 text-sm">
+                Dedicated to spreading the eternal wisdom of the Bhagavad Gita.<br>
+                May you find peace and clarity on your journey.
+            </p>
+            <div class="mt-8 text-sm text-gray-500 flex flex-col items-center gap-1">
+                <p>&copy; <span id="year"></span> All rights reserved.</p>
+                <p class="tracking-wide">Built by <span class="text-divine-gold font-medium uppercase text-xs">Shivansh Sagar</span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg', 'bg-[#0B1021]/90');
+                navbar.classList.remove('bg-[rgba(15,23,42,0.6)]');
+            } else {
+                navbar.classList.remove('shadow-lg', 'bg-[#0B1021]/90');
+                navbar.classList.add('bg-[rgba(15,23,42,0.6)]');
+            }
+        });
+
+        // Intersection Observer for Reveal Animations
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => {
+            revealOnScroll.observe(el);
+        });
+
+        // PDF Viewer Toggle Logic
+        function togglePdfViewer() {
+            const viewerSection = document.getElementById('pdf-viewer-section');
+            const book = document.getElementById('mystical-book');
+            
+            if (viewerSection.classList.contains('open')) {
+                // Close it
+                viewerSection.classList.remove('open');
+                book.style.transform = 'rotateY(0deg) scale(1)';
+                // Scroll slightly up so they see the book again
+                setTimeout(() => {
+                    document.getElementById('read').scrollIntoView({ behavior: 'smooth' });
+                }, 300);
+            } else {
+                // Open it
+                viewerSection.classList.add('open');
+                // Animate book to look like it opened the magic
+                book.style.transform = 'rotateY(-20deg) scale(0.95)';
+                // Smooth scroll to the viewer
+                setTimeout(() => {
+                    viewerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 500);
+            }
+        }
+
+        // --- Canvas Particle Animation (Divine Dust) ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particlesArray;
+
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initParticles();
+        });
+
+        // Particle class
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x;
+                this.y = y;
+                this.directionX = directionX;
+                this.directionY = directionY;
+                this.size = size;
+                this.color = color;
+                this.alpha = Math.random() * 0.5 + 0.1;
+            }
+            // Method to draw individual particle
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = `rgba(255, 215, 0, ${this.alpha})`; // Gold dust
+                ctx.fill();
+            }
+            // Check particle position, move, draw
+            update() {
+                // reverse direction if hits border
+                if (this.x > canvas.width || this.x < 0) {
+                    this.directionX = -this.directionX;
+                }
+                if (this.y > canvas.height || this.y < 0) {
+                    this.directionY = -this.directionY;
+                }
+
+                // Move slowly upwards like embers/dust
+                this.y -= this.directionY;
+                this.x += this.directionX;
+
+                // Reset to bottom if it goes too high
+                if(this.y < 0) {
+                    this.y = canvas.height;
+                    this.x = Math.random() * canvas.width;
+                }
+
+                // Twinkle effect
+                this.alpha += (Math.random() - 0.5) * 0.02;
+                if(this.alpha < 0.1) this.alpha = 0.1;
+                if(this.alpha > 0.8) this.alpha = 0.8;
+
+                this.draw();
+            }
+        }
+
+        // Create particle array
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 15000;
+            // Cap particles for performance
+            if (numberOfParticles > 100) numberOfParticles = 100;
+            
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * 1) - 0.5;
+                let directionY = (Math.random() * 1) + 0.2; // Always move up slightly
+                let color = '#FFD700';
+
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        // Animation loop
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+        }
+
+        initParticles();
+        animateParticles();
+    </script>
+</body>
+</html>
