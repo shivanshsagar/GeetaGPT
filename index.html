@@ -145,34 +145,73 @@
             transform: translateY(0);
         }
 
-        /* Book UI Animations */
+        /* Book UI Animations - Ancient Tome Effect */
         .book-container {
-            perspective: 1000px;
+            perspective: 2000px; /* Deeper perspective for a grander feel */
         }
         .book {
             transform-style: preserve-3d;
-            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            position: relative;
         }
-        .book-open {
-            transform: rotateY(-180deg);
+        
+        /* Ancient book golden page edges */
+        .book::before {
+            content: '';
+            position: absolute;
+            top: 2%;
+            bottom: 2%;
+            right: -12px;
+            width: 12px;
+            background: repeating-linear-gradient(to bottom, #d4af37 0%, #aa8000 2%, #f3e5ab 4%, #d4af37 6%);
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            box-shadow: inset 3px 0 8px rgba(0,0,0,0.8);
+            transition: opacity 0.3s ease;
+            z-index: 1;
         }
+        .book-open::before {
+            opacity: 0; /* Hide thickness when opened to focus on pages */
+        }
+        
         .book-cover {
-            backface-visibility: hidden;
+            transform-style: preserve-3d;
             transform-origin: left center;
-            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
-            z-index: 2;
+            /* Heavy, slow ancient book opening curve */
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 20;
         }
+        
+        /* Inside of the front cover (hides mirrored text when flipped) */
+        .book-cover::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: #1a0b05; /* Dark leather brown */
+            border-radius: inherit;
+            transform: translateZ(-1px);
+        }
+        
         .book-open .book-cover {
-            transform: rotateY(-180deg);
+            /* Open like a real book to the left, slightly angled */
+            transform: rotateY(-160deg);
+            box-shadow: 20px 0 40px rgba(0,0,0,0.9);
         }
+        
         .book-content {
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s ease 0.5s;
+            /* Start slightly sunk and hidden in shadows */
+            transform: translateZ(-30px);
+            filter: brightness(0.3);
+            /* Delayed fade-in as cover opens */
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1) 0.3s;
+            z-index: 10;
         }
         .book-open .book-content {
             opacity: 1;
             pointer-events: auto;
+            transform: translateZ(0);
+            filter: brightness(1);
         }
 
         /* Particle Canvas */
