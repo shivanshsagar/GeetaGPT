@@ -242,9 +242,12 @@
                         <a href="#read" class="text-gray-300 hover:text-orange-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Read Geeta</a>
                     </div>
                 </div>
-                <div>
+                <div class="flex items-center gap-3">
                     <button onclick="openChatWindow()" class="px-5 py-2 bg-transparent border border-orange-400 text-orange-400 rounded-full hover:bg-orange-400 hover:text-white transition-all duration-300 font-medium text-sm">
                         Consult Krishna
+                    </button>
+                    <button onclick="openAstroChatWindow()" class="px-5 py-2 bg-transparent border border-purple-400 text-purple-400 rounded-full hover:bg-purple-400 hover:text-white transition-all duration-300 font-medium text-sm">
+                        AstroGPT
                     </button>
                 </div>
             </div>
@@ -427,16 +430,25 @@
         // Chat Window Logic
         // ----------------------------------------------------
         const chatUrl = "https://chatgpt.com/share/682ec65e-a408-8008-aa9f-2a1f221ebb41";
+        const astroUrl = "https://gemini.google.com/gem/1JNZOyUaVVtKCzpSY3Sw9sAGaB-aOV3tF?usp=sharing";
 
         function openChatWindow() {
+            openPopup(chatUrl, 'KrishnaChat');
+        }
+
+        function openAstroChatWindow() {
+            openPopup(astroUrl, 'AstroChat');
+        }
+
+        function openPopup(url, name) {
             // Opens a tailored, sized pop-up window like an app
             const width = 450;
             const height = 800;
             const left = (screen.width / 2) - (width / 2);
             const top = (screen.height / 2) - (height / 2);
             window.open(
-                chatUrl, 
-                'KrishnaChat', 
+                url, 
+                name, 
                 `toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, copyhistory=no, width=${width}, height=${height}, top=${top}, left=${left}`
             );
         }
